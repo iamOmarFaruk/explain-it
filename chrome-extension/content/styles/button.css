@@ -267,27 +267,32 @@
 /* Input container */
 .explain-it-input-container {
     display: flex;
-    padding: 12px;
+    padding: 12px 16px;
     border-top: 1px solid rgba(0, 0, 0, 0.1);
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.95);
+    align-items: center;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    position: relative;
 }
 
 .explain-it-input {
     flex: 1;
     border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: 18px;
-    padding: 8px 12px;
+    border-radius: 22px;
+    padding: 10px 16px;
     font-size: 14px;
     resize: none;
-    height: 36px;
+    height: 46px;
     max-height: 120px;
     outline: none;
     font-family: inherit;
-    background: rgba(255, 255, 255, 0.8);
-    transition: border-color 0.2s ease;
+    background: rgba(255, 255, 255, 0.9);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
     /* Hide scrollbar */
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE and Edge */
+    line-height: 1.5;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .explain-it-input::-webkit-scrollbar {
@@ -296,11 +301,12 @@
 
 .explain-it-input:focus {
     border-color: #4a6cf7;
+    box-shadow: 0 1px 6px rgba(74, 108, 247, 0.2);
 }
 
 .explain-it-send {
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     background-color: #4a6cf7;
     color: white;
@@ -310,16 +316,23 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(74, 108, 247, 0.3);
+    flex-shrink: 0;
 }
 
 .explain-it-send:hover {
     background-color: #3a5ce5;
+    transform: scale(1.05);
+}
+
+.explain-it-send:active {
+    transform: scale(0.95);
 }
 
 .explain-it-send svg {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
 }
 
 /* Code formatting */
