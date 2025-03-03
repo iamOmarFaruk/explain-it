@@ -3,10 +3,12 @@
     --background-light: #ffffff;
     --text-light: #1d1d1f;
     --border-light: #d2d2d7;
-    --accent-light: #0071e3;
+    --accent-light: #007AFF;
     --hover-light: #f5f5f7;
     --message-bg-light: #f5f5f7;
     --message-bot-bg-light: #e8e8ed;
+    --error-light: #FF3B30;
+    --success-light: #34C759;
     
     /* Dark theme variables */
     --background-dark: #1e1e1e;
@@ -16,6 +18,8 @@
     --hover-dark: #2d2d2d;
     --message-bg-dark: #2d2d2d;
     --message-bot-bg-dark: #363636;
+    --error-dark: #FF453A;
+    --success-dark: #30D158;
 }
 
 /* System theme detection */
@@ -28,6 +32,8 @@
         --hover: var(--hover-dark);
         --message-bg: var(--message-bg-dark);
         --message-bot-bg: var(--message-bot-bg-dark);
+        --error: var(--error-dark);
+        --success: var(--success-dark);
     }
 }
 
@@ -40,6 +46,8 @@
         --hover: var(--hover-light);
         --message-bg: var(--message-bg-light);
         --message-bot-bg: var(--message-bot-bg-light);
+        --error: var(--error-light);
+        --success: var(--success-light);
     }
 }
 
@@ -51,12 +59,13 @@
 }
 
 body {
-    width: 400px;
+    width: 360px;
     height: 500px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background-color: var(--background);
     color: var(--text);
     line-height: 1.5;
+    overflow: hidden;
 }
 
 .container {
@@ -80,9 +89,25 @@ header {
     z-index: 10;
 }
 
-header h1 {
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logo img {
+    width: 24px;
+    height: 24px;
+}
+
+.logo h1 {
     font-size: 18px;
     font-weight: 600;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
 }
 
 .icon-button {
@@ -93,35 +118,137 @@ header h1 {
     color: var(--text);
     cursor: pointer;
     transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .icon-button:hover {
     background-color: var(--hover);
 }
 
-/* Main chat container */
-main {
+.icon-button.loading {
+    position: relative;
+}
+
+.icon-button.loading svg {
+    visibility: hidden;
+}
+
+.icon-button.loading::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--text);
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Content area */
+.content {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Welcome screen */
+.welcome-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 100%;
+    padding: 24px;
+}
+
+.welcome-icon {
+    margin-bottom: 16px;
+}
+
+.welcome-screen h2 {
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+.welcome-screen p {
+    color: var(--text);
+    opacity: 0.8;
+    margin-bottom: 24px;
+}
+
+.setup-info {
+    width: 100%;
+    margin-bottom: 24px;
+}
+
+.setup-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 8px;
+    background-color: var(--hover);
+    margin-bottom: 8px;
+}
+
+.status-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: var(--accent);
+    color: white;
+    font-weight: bold;
+}
+
+.setup-item.not-configured .status-icon {
+    background-color: var(--error);
+}
+
+.setup-item.configured .status-icon {
+    background-color: var(--success);
+}
+
+.primary-button {
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.primary-button:hover {
+    opacity: 0.9;
+}
+
+/* Chat container */
+.chat-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.messages {
     flex: 1;
     overflow-y: auto;
     padding: 16px;
 }
 
-.welcome-message {
-    text-align: center;
-    padding: 32px 16px;
-}
-
-.welcome-message h2 {
-    font-size: 20px;
-    margin-bottom: 8px;
-}
-
-.welcome-message p {
-    color: var(--text);
-    opacity: 0.8;
-}
-
-/* Chat messages */
 .message {
     max-width: 85%;
     margin-bottom: 16px;
@@ -141,9 +268,14 @@ main {
     margin-right: auto;
 }
 
-/* Code highlighting */
+.message.error {
+    background-color: var(--error);
+    color: white;
+    margin-right: auto;
+}
+
 .message pre {
-    background-color: var(--background);
+    background-color: rgba(0, 0, 0, 0.1);
     border-radius: 6px;
     padding: 12px;
     margin: 8px 0;
@@ -155,74 +287,36 @@ main {
     font-size: 13px;
 }
 
-/* Footer */
-footer {
-    padding: 16px;
-    border-top: 1px solid var(--border);
-    background-color: var(--background);
-}
-
-.footer-actions {
+.input-container {
     display: flex;
     justify-content: center;
     gap: 12px;
+    padding: 16px;
+    border-top: 1px solid var(--border);
 }
 
-.footer-actions.hidden {
+/* Utility classes */
+.hidden {
     display: none;
 }
 
-.action-button {
-    background: none;
-    border: none;
-    padding: 8px;
-    border-radius: 6px;
+/* Notification */
+.notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100%);
+    padding: 12px 24px;
+    border-radius: 8px;
+    background: var(--background);
     color: var(--text);
-    cursor: pointer;
-    transition: background-color 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease;
+    z-index: 1000;
 }
 
-.action-button:hover {
-    background-color: var(--hover);
-}
-
-/* Typing indicator */
-.typing-indicator {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-    padding: 8px;
-}
-
-.typing-indicator.hidden {
-    display: none;
-}
-
-.typing-indicator span {
-    width: 8px;
-    height: 8px;
-    background-color: var(--text);
-    border-radius: 50%;
-    opacity: 0.4;
-    animation: typing 1s infinite;
-}
-
-.typing-indicator span:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.typing-indicator span:nth-child(3) {
-    animation-delay: 0.4s;
-}
-
-@keyframes typing {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-4px);
-    }
+.notification.show {
+    transform: translateX(-50%) translateY(0);
 }
 
 /* Scrollbar styles */

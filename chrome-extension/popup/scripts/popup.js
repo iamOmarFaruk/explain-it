@@ -15,21 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize
     checkApiKey();
-    checkPendingExplanation();
-
-    // Check if there's a pending explanation
-    function checkPendingExplanation() {
-        chrome.storage.local.get('pendingExplanation', (data) => {
-            if (data.pendingExplanation) {
-                welcomeScreen.classList.add('hidden');
-                chatContainer.classList.remove('hidden');
-                showExplanation(data.pendingExplanation.text, data.pendingExplanation.explanation);
-                
-                // Clear the pending explanation
-                chrome.storage.local.remove('pendingExplanation');
-            }
-        });
-    }
 
     // Check if API key is set
     async function checkApiKey() {
