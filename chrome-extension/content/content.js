@@ -195,15 +195,69 @@ function addMessage(text, sender) {
     messageElement.className = `explain-it-message ${sender}`;
     
     if (sender === 'bot') {
-        // Convert markdown to HTML
-        const formattedText = text
+        // Convert markdown to HTML with code block support
+        let formattedText = text
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
             .replace(/\*(.*?)\*/g, '<em>$1</em>')
-            .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
-            .replace(/`(.*?)`/g, '<code>$1</code>')
             .replace(/\n/g, '<br>');
         
+        // Process code blocks with syntax highlighting and copy button
+        formattedText = formattedText.replace(/```(.*?)\n([\s\S]*?)```/g, (match, language, code) => {
+            const languageClass = language ? ` class="language-${language}"` : '';
+            return `<div class="code-block">
+                <button class="copy-code-button">Copy</button>
+                <pre><code${languageClass}>${escapeHtml(code)}</code></pre>
+            </div>`;
+        });
+        
+        // Process inline code
+        formattedText = formattedText.replace(/`(.*?)`/g, '<code>$1</code>');
+        
         messageElement.innerHTML = formattedText;
+        
+        // Add event listeners to copy buttons
+        const copyButtons = messageElement.querySelectorAll('.copy-code-button');
+        copyButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const codeBlock = this.nextElementSibling.querySelector('code');
+                const textToCopy = codeBlock.textContent;
+                
+                navigator.clipboard.writeText(textToCopy)
+                    .then(() => {
+                        // Show success feedback
+                        const originalText = this.textContent;
+                        this.textContent = 'Copied!';
+                        this.style.backgroundColor = '#4a6cf7';
+                        this.style.color = 'white';
+                        
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                            this.style.backgroundColor = '';
+                            this.style.color = '';
+                        }, 2000);
+                    })
+                    .catch(() => {
+                        this.textContent = 'Failed!';
+                        this.style.backgroundColor = '#f44336';
+                        this.style.color = 'white';
+                        
+                        setTimeout(() => {
+                            this.textContent = 'Copy';
+                            this.style.backgroundColor = '';
+                            this.style.color = '';
+                        }, 2000);
+                    });
+            });
+        });
+        
+        // Basic syntax highlighting for code blocks
+        const codeBlocks = messageElement.querySelectorAll('pre code');
+        codeBlocks.forEach(codeBlock => {
+            // Apply simple syntax highlighting
+            const code = codeBlock.innerHTML;
+            const highlightedCode = highlightSyntax(code);
+            codeBlock.innerHTML = highlightedCode;
+        });
     } else {
         messageElement.textContent = text;
     }
@@ -212,6 +266,44 @@ function addMessage(text, sender) {
     
     // Scroll to bottom
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Helper function to escape HTML special characters
+function escapeHtml(string) {
+    const htmlEntities = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    };
+    return string.replace(/[&<>"']/g, (match) => htmlEntities[match]);
+}
+
+// Simple syntax highlighting function
+function highlightSyntax(code) {
+    // Keywords
+    const keywords = ['function', 'return', 'if', 'else', 'for', 'while', 'var', 'let', 'const', 'class', 'import', 'export', 'from', 'async', 'await', 'try', 'catch', 'switch', 'case', 'break', 'continue', 'default', 'new', 'this', 'super'];
+    
+    // Replace strings
+    let highlighted = code.replace(/(["'`])(.*?)\1/g, '<span class="string">$&</span>');
+    
+    // Replace numbers
+    highlighted = highlighted.replace(/\b(\d+)\b/g, '<span class="number">$&</span>');
+    
+    // Replace comments
+    highlighted = highlighted.replace(/(\/\/.*)/g, '<span class="comment">$&</span>');
+    
+    // Replace keywords
+    for (const keyword of keywords) {
+        const regex = new RegExp(`\\b(${keyword})\\b`, 'g');
+        highlighted = highlighted.replace(regex, '<span class="keyword">$&</span>');
+    }
+    
+    // Replace function declarations
+    highlighted = highlighted.replace(/\b([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g, '<span class="function">$1</span>(');
+    
+    return highlighted;
 }
 
 // Show loading message
