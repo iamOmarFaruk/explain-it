@@ -96,7 +96,13 @@ function cleanCache() {
     }
 }
 
-// Error handling for unhandled rejections
-window.addEventListener('unhandledrejection', function(event) {
-    console.error('Unhandled promise rejection:', event.reason);
+// Service workers don't have access to the window object
+// Using the self global object instead for error handling
+self.addEventListener('error', function(event) {
+    console.error('Error in service worker:', event.message);
+});
+
+// Handle unhandled promise rejections in service worker context
+self.addEventListener('unhandledrejection', function(event) {
+    console.error('Unhandled promise rejection in service worker:', event.reason);
 }); 
