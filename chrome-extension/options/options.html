@@ -5,6 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Explain It - Options</title>
     <link rel="stylesheet" href="styles/options.css">
+    <style>
+        /* Additional spacing for buttons */
+        .button-primary {
+            margin: 10px 0;
+            padding: 10px 20px;
+        }
+        
+        /* Space between input and button */
+        #apiKey {
+            margin-bottom:5px;
+        }
+        
+        /* Space above the save button */
+        .save-section {
+            margin-top: 25px;
+            text-align: left; /* Align button to the left */
+        }
+
+        textarea#systemInstructions {
+    width: 97%;
+}
+#apiKey {
+    margin-bottom: 5px;
+    width: 97%;
+}
+    </style>
 </head>
 <body>
     <div class="container">
@@ -19,13 +45,23 @@
                 <div class="form-group">
                     <label for="apiKey">OpenRouter API Key</label>
                     <input type="password" id="apiKey" placeholder="Enter your API key">
-                    <button id="testConnection" class="button-primary">Test Connection</button>
+                    
+                    <div style="margin: 15px 0;">
+                        <button id="testConnection" class="button-primary">Test Connection</button>
+                    </div>
+                    
                     <p class="help-text">Get your API key from <a href="https://openrouter.ai/keys" target="_blank">OpenRouter.ai</a></p>
                 </div>
 
                 <div class="form-group">
                     <label for="modelSelector">AI Model</label>
                     <select id="modelSelector">
+                        <optgroup label="Free Models">
+                            <option value="qwen/qwen2.5-vl-72b-instruct:free">Qwen 2.5 VL 72B (Free)</option>
+                            <option value="deepseek/deepseek-r1-distill-llama-70b:free">DeepSeek R1 Distill Llama 70B (Free)</option>
+                            <option value="deepseek/deepseek-r1:free">DeepSeek R1 (Free)</option>
+                            <option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B Instruct (Free)</option>
+                        </optgroup>
                         <optgroup label="Anthropic">
                             <option value="anthropic/claude-3-opus">Claude 3 Opus (Most Powerful)</option>
                             <option value="anthropic/claude-3-sonnet" selected>Claude 3 Sonnet (Recommended)</option>
@@ -60,14 +96,41 @@
                 </div>
             </section>
 
-            <section class="settings-section">
+            <section class="settings-section" style="position: relative;">
                 <h2>Appearance</h2>
+                <small>Not done yet</small>
+                
                 <div class="form-group">
                     <label for="themeToggle">Theme</label>
                     <div class="toggle-switch">
                         <input type="checkbox" id="themeToggle">
                         <label for="themeToggle"></label>
                         <span class="toggle-label">Dark Mode</span>
+                    </div>
+                </div>
+                
+                <div class="form-group" style="opacity: 0.6; pointer-events: none;">
+                    <label for="blurToggle">Blur Effect</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="blurToggle" disabled>
+                        <label for="blurToggle"></label>
+                        <span class="toggle-label">Glass Effect</span>
+                    </div>
+                </div>
+                
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
+                            background: rgba(255, 255, 255, 0.5); 
+                            backdrop-filter: blur(2px); 
+                            display: flex; 
+                            align-items: center; 
+                            justify-content: center; 
+                            z-index: 10;">
+                    <div style="background: rgba(0, 0, 0, 0.7); 
+                                color: white; 
+                                padding: 8px 16px; 
+                                border-radius: 4px; 
+                                font-weight: bold;">
+                        Coming Soon
                     </div>
                 </div>
             </section>

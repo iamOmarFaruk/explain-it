@@ -8,7 +8,7 @@ const CACHE_EXPIRY = 5 * 60 * 1000; // 5 minutes
 // Default settings
 const defaultSettings = {
     apiKey: '',
-    model: 'anthropic/claude-3-sonnet',
+    model: 'qwen/qwen2.5-vl-72b-instruct:free', // Using a free model as default
     systemInstructions: 'Please explain the selected text in a clear and concise manner.'
 };
 

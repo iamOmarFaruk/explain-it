@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Default settings
     const defaultSettings = {
         apiKey: '',
-        model: 'anthropic/claude-3-sonnet',
+        model: 'qwen/qwen2.5-vl-72b-instruct:free',
         systemInstructions: 'Please explain the selected text in a clear and concise manner.',
         darkMode: false
     };
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Populate form fields
             apiKeyInput.value = settings.apiKey || '';
-            modelSelector.value = settings.model || 'anthropic/claude-3-sonnet';
+            modelSelector.value = settings.model || 'qwen/qwen2.5-vl-72b-instruct:free';
             systemInstructions.value = settings.systemInstructions || 'Please explain the selected text in a clear and concise manner.';
             themeToggle.checked = settings.darkMode || false;
             
@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    "model": "anthropic/claude-3-haiku", // Using a fast model for testing
+                    "model": "qwen/qwen2.5-vl-72b-instruct:free", // Using a free model for testing
                     "messages": [
                         {
                             "role": "user",
