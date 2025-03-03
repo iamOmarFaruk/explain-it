@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Default settings
     const defaultSettings = {
         apiKey: '',
-        model: 'qwen/qwen2.5-vl-72b-instruct:free',
+        model: 'openai/gpt-4o-mini',
         systemInstructions: 'Please explain the selected text in a clear and concise manner.',
         darkMode: false
     };

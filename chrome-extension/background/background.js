@@ -8,7 +8,7 @@ const CACHE_EXPIRY = 5 * 60 * 1000; // 5 minutes
 // Default settings
 const defaultSettings = {
     apiKey: '',
-    model: 'qwen/qwen2.5-vl-72b-instruct:free', // Using a free model as default
+    model: 'openai/gpt-4o-mini',
     systemInstructions: 'Please explain the selected text in a clear and concise manner.'
 };
 
