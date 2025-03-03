@@ -5,15 +5,6 @@ let extensionSettings = {
     systemInstructions: 'Please explain the selected text in a clear and concise manner.'
 };
 
-// Set debug mode
-const DEBUG = true;
-
-function debugLog(...args) {
-    if (DEBUG) {
-        console.log('[ExplainIt Debug]', ...args);
-    }
-}
-
 // Safely send a message to the background script
 function safelySendMessage(message, callback) {
     try {
@@ -31,7 +22,7 @@ try {
     safelySendMessage({ action: 'getSettings' }, (response) => {
         if (response && response.settings) {
             extensionSettings = response.settings;
-            debugLog('Settings loaded from background script');
+            console.log('Settings loaded from background script');
         } else {
             console.warn('Failed to load settings, using defaults');
         }
@@ -46,7 +37,7 @@ try {
         try {
             if (message.action === 'settingsUpdated' && message.settings) {
                 extensionSettings = message.settings;
-                debugLog('Settings updated:', extensionSettings);
+                console.log('Settings updated:', extensionSettings);
             }
             // Always return something to avoid "The message port closed before a response was received" errors
             sendResponse({ received: true });
@@ -93,25 +84,6 @@ popupContainer.innerHTML = `
     </div>
 `;
 
-// Add Bengali font support to the document
-function addBengaliFontSupport() {
-    const fontLink = document.createElement('link');
-    fontLink.rel = 'stylesheet';
-    fontLink.href = 'https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap';
-    document.head.appendChild(fontLink);
-
-    // Add CSS for Bengali text
-    const bengaliStyle = document.createElement('style');
-    bengaliStyle.textContent = `
-        .bengali-code {
-            font-family: 'Noto Sans Bengali', Arial, sans-serif !important;
-            line-height: 1.5;
-            direction: ltr;
-        }
-    `;
-    document.head.appendChild(bengaliStyle);
-}
-
 // Add highlight.js link and script to document head
 function addHighlightJs() {
     // Add CSS
@@ -120,79 +92,9 @@ function addHighlightJs() {
     highlightCss.href = chrome.runtime.getURL('utils/default.min.css');
     document.head.appendChild(highlightCss);
     
-    // Add additional styling for code blocks
-    const codeBlockStyle = document.createElement('style');
-    codeBlockStyle.textContent = `
-        .code-block {
-            position: relative;
-            margin: 10px 0;
-            border-radius: 6px;
-            overflow: hidden;
-        }
-        
-        .code-block pre {
-            margin: 0;
-            padding: 12px;
-            border-radius: 6px;
-            overflow-x: auto;
-        }
-        
-        .code-block code {
-            font-family: 'Consolas', 'Monaco', 'Menlo', monospace;
-            font-size: 0.9em;
-            tab-size: 4;
-        }
-        
-        .bengali-code {
-            font-family: 'Noto Sans Bengali', Arial, sans-serif !important;
-            font-size: 1.1em;
-        }
-        
-        .copy-code-button {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            padding: 4px 8px;
-            border: none;
-            border-radius: 4px;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: inherit;
-            font-size: 12px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            z-index: 10;
-        }
-        
-        .copy-code-button:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-
-        /* Improve placeholder rendering */
-        .explain-it-message.loading {
-            display: flex;
-            justify-content: center;
-            padding: 20px 0;
-        }
-
-        .explain-it-popup-container.visible {
-            display: flex;
-        }
-
-        .explain-it-popup {
-            width: 90%;
-            max-width: 500px;
-            height: 90%;
-            max-height: 600px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-    `;
-    document.head.appendChild(codeBlockStyle);
-    
     // Check if highlight.js is already loaded
     if (typeof window.hljs !== 'undefined') {
-        debugLog('highlight.js already loaded');
+        console.log('highlight.js already loaded');
         return;
     }
     
@@ -202,7 +104,7 @@ function addHighlightJs() {
     
     // Initialize highlight.js after it loads
     highlightJs.onload = function() {
-        debugLog('highlight.js loaded successfully');
+        console.log('highlight.js loaded successfully');
         
         // Configure highlight.js
         if (typeof window.hljs !== 'undefined') {
@@ -215,7 +117,7 @@ function addHighlightJs() {
             // If there are already code blocks in the page, highlight them
             const existingCodeBlocks = document.querySelectorAll('pre code.hljs');
             if (existingCodeBlocks.length > 0) {
-                debugLog(`Found ${existingCodeBlocks.length} existing code blocks to highlight`);
+                console.log(`Found ${existingCodeBlocks.length} existing code blocks to highlight`);
                 existingCodeBlocks.forEach(block => {
                     window.hljs.highlightElement(block);
                 });
@@ -231,9 +133,8 @@ function addHighlightJs() {
     document.head.appendChild(highlightJs);
 }
 
-// Call the function to add highlight.js and Bengali font support
+// Call the function to add highlight.js
 addHighlightJs();
-addBengaliFontSupport();
 
 document.body.appendChild(floatingButton);
 document.body.appendChild(popupContainer);
@@ -290,7 +191,7 @@ function showButton(e) {
     floatingButton.classList.add('visible');
     isButtonVisible = true;
     
-    debugLog('Explain button shown');
+    console.log('Explain button shown');
 }
 
 // Hide floating button
@@ -340,94 +241,78 @@ function hidePopup() {
     popupContainer.classList.remove('visible');
 }
 
-// Improved escapeHtml function to prevent double escaping
-function escapeHtml(string) {
-    // Check if already escaped
-    if (string.includes('&lt;') || string.includes('&gt;') || string.includes('&amp;')) {
-        return string;
-    }
-    
-    const htmlEntities = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;'
-    };
-    return string.replace(/[&<>"']/g, (match) => htmlEntities[match]);
-}
-
-// Parse markdown text to HTML with improved code block handling
+// Parse markdown text to HTML
 function parseMarkdown(text) {
-    // Track code blocks separately for better handling
-    const codeBlockPlaceholders = {};
-    let codeBlockId = 0;
+    // First, temporarily protect code blocks from markdown processing
+    const codeBlocks = [];
+    let codeBlockCounter = 0;
     
-    // Replace all code blocks with unique placeholders
-    let processedText = text.replace(/```(.*?)\n([\s\S]*?)```/g, (match, lang, code) => {
-        const placeholder = `__CODE_BLOCK_${codeBlockId}__`;
-        codeBlockPlaceholders[placeholder] = { lang: lang.trim(), code: code };
-        codeBlockId++;
+    // Extract code blocks and replace with placeholders
+    const textWithoutCodeBlocks = text.replace(/```(.*?)\n([\s\S]*?)```/g, (match) => {
+        const placeholder = `__PROTECTED_CODE_BLOCK_${codeBlockCounter}__`;
+        codeBlocks.push({ placeholder, content: match });
+        codeBlockCounter++;
         return placeholder;
     });
     
-    // Track inline code separately
-    const inlineCodePlaceholders = {};
-    let inlineCodeId = 0;
+    // Extract inline code and replace with placeholders
+    const inlineCode = [];
+    let inlineCodeCounter = 0;
     
-    // Replace all inline code with unique placeholders
-    processedText = processedText.replace(/`([^`]+)`/g, (match, code) => {
-        const placeholder = `__INLINE_CODE_${inlineCodeId}__`;
-        inlineCodePlaceholders[placeholder] = code;
-        inlineCodeId++;
+    const textWithoutInlineCode = textWithoutCodeBlocks.replace(/`([^`]+)`/g, (match) => {
+        const placeholder = `__PROTECTED_INLINE_CODE_${inlineCodeCounter}__`;
+        inlineCode.push({ placeholder, content: match });
+        inlineCodeCounter++;
         return placeholder;
     });
     
-    // Process standard markdown
-    // Headers
-    processedText = processedText.replace(/^### (.*?)$/gm, '<h3 class="chat-heading">$1</h3>');
-    processedText = processedText.replace(/^## (.*?)$/gm, '<h2 class="chat-heading">$1</h2>');
-    processedText = processedText.replace(/^# (.*?)$/gm, '<h1 class="chat-heading">$1</h1>');
+    // Process markdown on text without code
+    let parsed = textWithoutInlineCode;
+    
+    // Headers (adjusted for chat context - using smaller font sizes)
+    parsed = parsed.replace(/^### (.*?)$/gm, '<h3 class="chat-heading">$1</h3>');
+    parsed = parsed.replace(/^## (.*?)$/gm, '<h2 class="chat-heading">$1</h2>');
+    parsed = parsed.replace(/^# (.*?)$/gm, '<h1 class="chat-heading">$1</h1>');
     
     // Bold
-    processedText = processedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    parsed = parsed.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     
     // Italic
-    processedText = processedText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    parsed = parsed.replace(/\*(.*?)\*/g, '<em>$1</em>');
     
     // Strikethrough
-    processedText = processedText.replace(/~~(.*?)~~/g, '<del>$1</del>');
+    parsed = parsed.replace(/~~(.*?)~~/g, '<del>$1</del>');
     
-    // Lists - improve list handling
+    // Lists
     // Unordered lists
-    processedText = processedText.replace(/^\s*[\-\*] (.*?)$/gm, '<ul><li>$1</li></ul>');
-    processedText = processedText.replace(/<\/ul>\s*<ul>/g, '');
+    parsed = parsed.replace(/^\s*[\-\*] (.*?)$/gm, '<ul><li>$1</li></ul>');
+    parsed = parsed.replace(/<\/ul>\s*<ul>/g, '');
     
     // Ordered lists
-    processedText = processedText.replace(/^\s*(\d+)\. (.*?)$/gm, '<ol><li>$2</li></ol>');
-    processedText = processedText.replace(/<\/ol>\s*<ol>/g, '');
+    parsed = parsed.replace(/^\s*(\d+)\. (.*?)$/gm, '<ol><li>$2</li></ol>');
+    parsed = parsed.replace(/<\/ol>\s*<ol>/g, '');
     
     // Blockquote
-    processedText = processedText.replace(/^\> (.*?)$/gm, '<blockquote>$1</blockquote>');
-    processedText = processedText.replace(/<\/blockquote>\s*<blockquote>/g, '<br>');
+    parsed = parsed.replace(/^\> (.*?)$/gm, '<blockquote>$1</blockquote>');
+    parsed = parsed.replace(/<\/blockquote>\s*<blockquote>/g, '<br>');
     
     // Links
-    processedText = processedText.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    parsed = parsed.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
     
     // Line breaks
-    processedText = processedText.replace(/\n/g, '<br>');
+    parsed = parsed.replace(/\n/g, '<br>');
     
-    // Restore inline code with proper HTML escaping
-    for (const placeholder in inlineCodePlaceholders) {
-        const escapedCode = escapeHtml(inlineCodePlaceholders[placeholder]);
-        processedText = processedText.replace(placeholder, `<code>${escapedCode}</code>`);
-    }
+    // Restore inline code
+    inlineCode.forEach(item => {
+        parsed = parsed.replace(item.placeholder, item.content);
+    });
     
-    // For code blocks, we'll return the placeholders and process them separately during streaming
-    return {
-        text: processedText,
-        codeBlocks: codeBlockPlaceholders
-    };
+    // Restore code blocks
+    codeBlocks.forEach(item => {
+        parsed = parsed.replace(item.placeholder, item.content);
+    });
+    
+    return parsed;
 }
 
 // Add message to chat with streaming effect
@@ -455,20 +340,152 @@ function addMessage(text, sender) {
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-// Improved streaming content function
+// Process and stream content to the container
 function streamContent(text, container) {
-    // Parse the markdown and prepare the content with code blocks separated
-    const parsedContent = parseMarkdown(text);
-    const formattedText = parsedContent.text;
-    const codeBlocks = parsedContent.codeBlocks;
+    // First, process the markdown and prepare the content
+    let formattedText = parseMarkdown(text);
     
     // Process thinking tags for thinker model
     const isThinkingModel = extensionSettings.model.toLowerCase().includes('thinker');
-    let processedText = formattedText.replace(/<think>([\s\S]*?)<\/think>/gi, (match, content) => {
+    formattedText = formattedText.replace(/<think>([\s\S]*?)<\/think>/gi, (match, content) => {
         if (isThinkingModel) {
             return `<div class="thinking-content">${content}</div>`;
         }
         return match;
+    });
+    
+    // Process code blocks with syntax highlighting and copy button
+    let codeBlocks = [];
+    let codeBlockIndex = 0;
+    
+    formattedText = formattedText.replace(/```(.*?)\n([\s\S]*?)```/g, (match, language, code) => {
+        // Clean up and normalize language identifier
+        let normalizedLang = language.trim().toLowerCase();
+        
+        // Handle common language aliases
+        const langMap = {
+            // JavaScript and related
+            'js': 'javascript',
+            'ts': 'typescript',
+            'jsx': 'javascript',
+            'tsx': 'typescript',
+            'node': 'javascript',
+            
+            // Web-related
+            'html': 'xml',
+            'htm': 'xml',
+            'css': 'css',
+            'scss': 'scss',
+            'sass': 'scss',
+            'less': 'less',
+            'json': 'json',
+            'xml': 'xml',
+            'svg': 'xml',
+            
+            // C-family languages
+            'c': 'c',
+            'cpp': 'cpp',
+            'c++': 'cpp',
+            'csharp': 'csharp',
+            'c#': 'csharp',
+            'objc': 'objectivec',
+            'objective-c': 'objectivec',
+            
+            // JVM languages
+            'java': 'java',
+            'kotlin': 'kotlin',
+            'scala': 'scala',
+            'groovy': 'groovy',
+            
+            // Mobile development
+            'swift': 'swift',
+            'dart': 'dart',
+            'flutter': 'dart',
+            
+            // Scripting languages
+            'py': 'python',
+            'python': 'python',
+            'rb': 'ruby',
+            'ruby': 'ruby',
+            'php': 'php',
+            'perl': 'perl',
+            'powershell': 'powershell',
+            'ps': 'powershell',
+            'ps1': 'powershell',
+            
+            // Shell/Bash
+            'sh': 'bash',
+            'shell': 'bash',
+            'bash': 'bash',
+            'zsh': 'bash',
+            'cmd': 'dos',
+            'batch': 'dos',
+            
+            // Systems programming
+            'go': 'go',
+            'golang': 'go',
+            'rust': 'rust',
+            'rs': 'rust',
+            
+            // Functional languages
+            'haskell': 'haskell',
+            'hs': 'haskell',
+            'lisp': 'lisp',
+            'clojure': 'clojure',
+            'clj': 'clojure',
+            'elixir': 'elixir',
+            
+            // Database
+            'sql': 'sql',
+            'mysql': 'sql',
+            'postgresql': 'pgsql',
+            'postgres': 'pgsql',
+            'pgsql': 'pgsql',
+            'mongodb': 'javascript',
+            'mongo': 'javascript',
+            
+            // Markup and documentation
+            'markdown': 'markdown',
+            'md': 'markdown',
+            'yaml': 'yaml',
+            'yml': 'yaml',
+            'toml': 'ini',
+            
+            // Configuration
+            'ini': 'ini',
+            'conf': 'apache',
+            'config': 'ini',
+            
+            // No language specified
+            '': ''
+        };
+        
+        // Map language alias to proper name if needed
+        if (langMap[normalizedLang]) {
+            normalizedLang = langMap[normalizedLang];
+        }
+        
+        // Escape HTML content for safe display - but only once
+        // We don't want to double-escape as it causes the entity display issue
+        const escapedCode = escapeHtml(code);
+        
+        // Add to code blocks array with placeholder
+        const placeholder = `__CODE_BLOCK_${codeBlockIndex}__`;
+        codeBlocks.push({
+            placeholder,
+            language: normalizedLang,
+            code: escapedCode
+        });
+        
+        codeBlockIndex++;
+        return placeholder;
+    });
+    
+    // Process inline code with proper escaping
+    formattedText = formattedText.replace(/`(.*?)`/g, (match, code) => {
+        // Escape inline code content - but only once
+        const escapedCode = escapeHtml(code);
+        return `<code>${escapedCode}</code>`;
     });
     
     // Start streaming the content
@@ -484,122 +501,113 @@ function streamContent(text, container) {
     typingIndicator.innerHTML = '<span>.</span><span>.</span><span>.</span>';
     container.appendChild(typingIndicator);
     
-    // Debug info
-    debugLog('Starting streaming with text length:', processedText.length);
-    debugLog('Code blocks found:', Object.keys(codeBlocks).length);
-    
     // Streaming function
     const streamNextChunk = () => {
-        if (currentIndex < processedText.length) {
+        if (currentIndex < formattedText.length) {
             // Check if we're at a code block placeholder
-            const codeBlockRegex = /__CODE_BLOCK_(\d+)__/;
-            const remainingText = processedText.substring(currentIndex);
-            const match = remainingText.match(codeBlockRegex);
+            const codeBlockMatch = codeBlocks.find(block => 
+                formattedText.substring(currentIndex).startsWith(block.placeholder)
+            );
             
-            if (match && match.index === 0) {
-                // Found a code block placeholder at the current position
-                const placeholder = match[0];
-                const blockId = match[1];
-                debugLog('Found code block:', placeholder);
-                
+            if (codeBlockMatch) {
                 // Remove the typing indicator
                 if (typingIndicator.parentNode) {
                     container.removeChild(typingIndicator);
                 }
                 
-                if (codeBlocks[placeholder]) {
-                    const { lang, code } = codeBlocks[placeholder];
-                    
-                    // Check for Bengali content
-                    const containsBengali = /[\u0980-\u09FF]/.test(code);
-                    const bengaliClass = containsBengali ? 'bengali-code' : '';
-                    
-                    // Create code block HTML
-                    const codeBlockHtml = `
-                        <div class="code-block">
-                            <button class="copy-code-button">Copy</button>
-                            <pre><code class="hljs ${lang ? 'language-' + lang : ''} ${bengaliClass}">${escapeHtml(code)}</code></pre>
-                        </div>
-                    `;
-                    
-                    // Append code block using DOM methods to ensure proper structure
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = codeBlockHtml;
-                    const codeBlockElement = tempDiv.firstChild;
-                    container.appendChild(codeBlockElement);
-                    
-                    // Add copy button functionality
-                    const copyButton = codeBlockElement.querySelector('.copy-code-button');
-                    if (copyButton) {
-                        copyButton.addEventListener('click', () => {
-                            const codeContent = code;
-                            navigator.clipboard.writeText(codeContent).then(() => {
-                                copyButton.textContent = 'Copied!';
-                                copyButton.style.backgroundColor = '#4a6cf7';
-                                copyButton.style.color = 'white';
+                // Replace placeholder with code block
+                const languageClass = codeBlockMatch.language ? `language-${codeBlockMatch.language}` : '';
+                const codeBlockHtml = `<div class="code-block">
+                    <button class="copy-code-button">Copy</button>
+                    <pre><code class="hljs ${languageClass}">${codeBlockMatch.code}</code></pre>
+                </div>`;
+                
+                // Insert the code block using a temporary element to ensure proper parsing
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = codeBlockHtml;
+                const codeBlockElement = tempDiv.firstChild;
+                container.appendChild(codeBlockElement);
+                
+                // Add event listener to copy button
+                const copyButton = codeBlockElement.querySelector('.copy-code-button');
+                if (copyButton) {
+                    copyButton.addEventListener('click', function() {
+                        const codeBlock = this.nextElementSibling.querySelector('code');
+                        const textToCopy = codeBlock.textContent;
+                        
+                        navigator.clipboard.writeText(textToCopy)
+                            .then(() => {
+                                // Show success feedback
+                                const originalText = this.textContent;
+                                this.textContent = 'Copied!';
+                                this.style.backgroundColor = '#4a6cf7';
+                                this.style.color = 'white';
                                 
                                 setTimeout(() => {
-                                    copyButton.textContent = 'Copy';
-                                    copyButton.style.backgroundColor = '';
-                                    copyButton.style.color = '';
+                                    this.textContent = originalText;
+                                    this.style.backgroundColor = '';
+                                    this.style.color = '';
                                 }, 2000);
-                            }).catch(err => {
-                                console.error('Copy failed:', err);
-                                copyButton.textContent = 'Failed';
-                                copyButton.style.backgroundColor = '#f44336';
+                            })
+                            .catch(() => {
+                                this.textContent = 'Failed!';
+                                this.style.backgroundColor = '#f44336';
+                                this.style.color = 'white';
                                 
                                 setTimeout(() => {
-                                    copyButton.textContent = 'Copy';
-                                    copyButton.style.backgroundColor = '';
+                                    this.textContent = 'Copy';
+                                    this.style.backgroundColor = '';
+                                    this.style.color = '';
                                 }, 2000);
                             });
-                        });
-                    }
-                    
-                    // Apply syntax highlighting
-                    const codeElement = codeBlockElement.querySelector('pre code');
-                    if (codeElement) {
-                        try {
-                            if (typeof window.hljs !== 'undefined') {
-                                window.hljs.highlightElement(codeElement);
-                            } else {
-                                // Fallback to simple highlighting
-                                applyFallbackHighlighting(codeElement, lang);
-                            }
-                        } catch (err) {
-                            console.error('Syntax highlighting error:', err);
-                            // Fallback to displaying without highlighting
-                        }
-                    }
-                } else {
-                    // Placeholder not found in codeBlocks, just insert as text
-                    const textNode = document.createTextNode(placeholder);
-                    container.appendChild(textNode);
+                    });
                 }
                 
-                // Add the typing indicator back
+                // Highlight the code
+                const codeElement = codeBlockElement.querySelector('pre code');
+                if (codeElement) {
+                    try {
+                        if (typeof window.hljs !== 'undefined') {
+                            // Detect if the code might contain non-Latin scripts like Bengali
+                            const containsNonLatin = /[\u0980-\u09FF]/.test(codeElement.textContent);
+                            if (containsNonLatin) {
+                                // If it contains Bengali script, add appropriate lang attribute
+                                codeElement.setAttribute('lang', 'bn');
+                            }
+                            
+                            // Apply highlighting
+                            window.hljs.highlightElement(codeElement);
+                        } else {
+                            // Fallback to simple syntax highlighting
+                            applyFallbackHighlighting(codeElement, codeBlockMatch.language);
+                        }
+                    } catch (error) {
+                        console.error('Error applying syntax highlighting:', error);
+                        
+                        // Try to apply basic syntax highlighting as fallback
+                        try {
+                            applyFallbackHighlighting(codeElement, codeBlockMatch.language);
+                        } catch (e) {
+                            console.error('Even basic highlighting failed:', e);
+                        }
+                    }
+                }
+                
+                // Add the typing indicator again
                 container.appendChild(typingIndicator);
                 
                 // Skip past the placeholder
-                currentIndex += placeholder.length;
+                currentIndex += codeBlockMatch.placeholder.length;
             } else {
                 // Stream regular content
-                const chunk = processedText.substring(currentIndex, currentIndex + streamingSpeed);
+                const chunk = formattedText.substring(currentIndex, currentIndex + streamingSpeed);
                 
                 // Remove the typing indicator, add the chunk, then add the indicator back
                 if (typingIndicator.parentNode) {
                     container.removeChild(typingIndicator);
                 }
                 
-                // Append the chunk as HTML
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = chunk;
-                
-                // Add each child node individually to maintain proper structure
-                while (tempDiv.firstChild) {
-                    container.appendChild(tempDiv.firstChild);
-                }
-                
+                container.innerHTML += chunk;
                 container.appendChild(typingIndicator);
                 
                 currentIndex += streamingSpeed;
@@ -615,7 +623,6 @@ function streamContent(text, container) {
             if (typingIndicator.parentNode) {
                 container.removeChild(typingIndicator);
             }
-            debugLog('Streaming completed');
         }
     };
     
@@ -639,7 +646,7 @@ floatingButton.addEventListener('click', async () => {
     
     if (selectedText) {
         try {
-            debugLog('Getting settings');
+            console.log('Getting settings');
             
             // First show the popup with loading state
             showPopup(selectedText, '');
@@ -648,7 +655,7 @@ floatingButton.addEventListener('click', async () => {
             // Update button state
             floatingButton.classList.add('loading');
             
-            debugLog('Sending explanation request to background script');
+            console.log('Sending explanation request to background script');
             
             // Before making the request, ensure we have an API key
             if (!extensionSettings.apiKey) {
@@ -793,63 +800,6 @@ function sendFollowUpQuestion() {
     });
 }
 
-// Improved function for fallback syntax highlighting
-function applyFallbackHighlighting(element, language) {
-    // Simple language detection
-    const code = element.textContent;
-    
-    // Check for Bengali content - use special handling
-    if (/[\u0980-\u09FF]/.test(code)) {
-        element.classList.add('bengali-code');
-        // For Bengali, we don't apply syntax highlighting to avoid breaking characters
-        return;
-    }
-    
-    // Apply basic syntax highlighting based on language
-    let highlightedCode = '';
-    
-    // Basic language-specific highlighting patterns
-    const patterns = {
-        // Keywords by language
-        keywords: {
-            common: ['function', 'return', 'if', 'else', 'for', 'while', 'break', 'continue', 'class', 'true', 'false', 'null'],
-            javascript: ['var', 'let', 'const', 'import', 'export', 'async', 'await'],
-            python: ['def', 'import', 'from', 'as', 'with', 'None', 'True', 'False'],
-            java: ['public', 'private', 'static', 'void', 'new', 'this', 'extends', 'implements'],
-            go: ['func', 'package', 'import', 'type', 'struct', 'interface', 'map', 'chan', 'defer']
-        },
-        
-        // Regex patterns for syntax elements
-        strings: /(["'`])(.*?)\1/g,
-        comments: /(\/\/.*|#.*|\/\*[\s\S]*?\*\/)/g,
-        numbers: /\b(\d+(\.\d+)?)\b/g,
-        functions: /\b([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g,
-        classes: /\b([A-Z][a-zA-Z0-9_]*)\b/g
-    };
-    
-    // Apply simple highlighting
-    highlightedCode = code
-        .replace(patterns.strings, '<span class="hljs-string">$&</span>')
-        .replace(patterns.comments, '<span class="hljs-comment">$&</span>')
-        .replace(patterns.numbers, '<span class="hljs-number">$&</span>')
-        .replace(patterns.functions, '<span class="hljs-function">$1</span>(')
-        .replace(patterns.classes, '<span class="hljs-class">$&</span>');
-    
-    // Apply language-specific keywords
-    const allKeywords = [
-        ...patterns.keywords.common,
-        ...(patterns.keywords[language] || [])
-    ];
-    
-    for (const keyword of allKeywords) {
-        const keywordRegex = new RegExp(`\\b(${keyword})\\b`, 'g');
-        highlightedCode = highlightedCode.replace(keywordRegex, '<span class="hljs-keyword">$&</span>');
-    }
-    
-    // Set the highlighted content
-    element.innerHTML = highlightedCode;
-}
-
 // Close popup when clicking the close button
 popupClose.addEventListener('click', () => {
     hidePopup();
@@ -870,7 +820,7 @@ document.addEventListener('mousedown', (e) => {
 
 // Notification system
 function showNotification(message, type = 'info') {
-    debugLog('Showing notification:', message, type);
+    console.log('Showing notification:', message, type);
     
     const notification = document.createElement('div');
     notification.className = `explain-it-notification ${type}`;
@@ -887,3 +837,271 @@ function showNotification(message, type = 'info') {
         setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
+
+// Add the escapeHtml helper function back since we're still using it
+function escapeHtml(string) {
+    const htmlEntities = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    };
+    return string.replace(/[&<>"']/g, (match) => htmlEntities[match]);
+}
+
+// Keep the simple syntax highlighting as a fallback
+function highlightSyntax(code) {
+    // Keywords for different languages
+    const languages = {
+        // Common programming keywords
+        common: [
+            'function', 'return', 'if', 'else', 'for', 'while', 'switch', 'case', 'break', 
+            'continue', 'default', 'new', 'this', 'super', 'class', 'true', 'false', 'null', 
+            'void', 'try', 'catch', 'finally', 'throw', 'typeof', 'instanceof', 'in'
+        ],
+        
+        // JavaScript and TypeScript
+        javascript: [
+            'var', 'let', 'const', 'import', 'export', 'from', 'async', 'await', 'yield',
+            'delete', 'debugger', 'arguments', 'undefined', 'NaN', 'Infinity', 'globalThis',
+            'Promise', 'Map', 'Set', 'WeakMap', 'WeakSet', 'Symbol', 'Proxy', 'Reflect'
+        ],
+        
+        // Java and related
+        java: [
+            'public', 'private', 'protected', 'static', 'final', 'abstract', 'extends', 
+            'implements', 'interface', 'package', 'import', 'throws', 'throw', 'synchronized',
+            'volatile', 'transient', 'native', 'strictfp', 'assert', 'enum', 'instanceof'
+        ],
+        
+        // C-family
+        c: [
+            'int', 'char', 'float', 'double', 'void', 'long', 'short', 'signed', 'unsigned',
+            'const', 'static', 'extern', 'register', 'volatile', 'struct', 'union', 'enum',
+            'typedef', 'sizeof', 'auto', 'goto', 'inline', 'restrict'
+        ],
+        
+        // C++ additional
+        cpp: [
+            'namespace', 'template', 'typename', 'using', 'operator', 'friend', 'virtual',
+            'mutable', 'explicit', 'export', 'inline', 'constexpr', 'thread_local', 'decltype',
+            'noexcept', 'nullptr', 'alignas', 'alignof', 'override', 'final'
+        ],
+        
+        // C# additional
+        csharp: [
+            'namespace', 'using', 'partial', 'virtual', 'override', 'sealed', 'readonly',
+            'ref', 'out', 'params', 'base', 'event', 'delegate', 'unsafe', 'checked', 'unchecked',
+            'fixed', 'lock', 'get', 'set', 'value', 'where', 'yield', 'var', 'dynamic', 'async', 'await'
+        ],
+        
+        // Python
+        python: [
+            'def', 'class', 'import', 'from', 'as', 'pass', 'with', 'lambda', 'global',
+            'nonlocal', 'raise', 'assert', 'yield', 'del', 'try', 'except', 'finally',
+            'async', 'await', 'None', 'True', 'False', 'and', 'or', 'not', 'is', 'in'
+        ],
+        
+        // Go
+        go: [
+            'func', 'package', 'import', 'const', 'var', 'type', 'struct', 'interface',
+            'map', 'chan', 'go', 'select', 'defer', 'fallthrough', 'goto', 'range', 
+            'nil', 'iota', 'make', 'new', 'append', 'cap', 'close', 'complex', 'copy', 'delete',
+            'len', 'panic', 'print', 'println', 'recover', 'string', 'int', 'bool', 'byte'
+        ],
+        
+        // Rust
+        rust: [
+            'fn', 'let', 'mut', 'pub', 'use', 'mod', 'struct', 'enum', 'trait', 'impl',
+            'type', 'const', 'static', 'match', 'move', 'ref', 'unsafe', 'where', 'Self',
+            'self', 'super', 'crate', 'dyn', 'async', 'await', 'extern', 'union'
+        ],
+        
+        // Swift
+        swift: [
+            'func', 'var', 'let', 'class', 'struct', 'enum', 'protocol', 'extension',
+            'guard', 'if', 'else', 'switch', 'case', 'default', 'for', 'while', 'do',
+            'break', 'continue', 'return', 'throw', 'throws', 'rethrows', 'try', 'catch',
+            'defer', 'import', 'typealias', 'associatedtype', 'init', 'deinit', 'get', 'set',
+            'willSet', 'didSet', 'open', 'public', 'internal', 'fileprivate', 'private',
+            'static', 'final', 'required', 'optional', 'lazy', 'dynamic', 'infix', 'prefix', 'postfix'
+        ],
+        
+        // Dart
+        dart: [
+            'abstract', 'dynamic', 'implements', 'as', 'else', 'import', 'assert', 'enum',
+            'in', 'async', 'export', 'interface', 'await', 'extends', 'is', 'break', 'external',
+            'library', 'case', 'factory', 'mixin', 'catch', 'false', 'new', 'class', 'final',
+            'null', 'const', 'finally', 'on', 'continue', 'for', 'operator', 'covariant',
+            'Function', 'part', 'default', 'get', 'rethrow', 'deferred', 'hide', 'return'
+        ],
+        
+        // PHP
+        php: [
+            'echo', 'print', 'include', 'require', 'require_once', 'include_once', 'die',
+            'exit', 'array', 'namespace', 'use', 'public', 'private', 'protected', 'static',
+            'final', 'abstract', 'extends', 'implements', 'interface', 'trait', 'global',
+            'as', 'clone', 'declare', 'goto', 'instanceof', 'insteadof', 'list'
+        ]
+    };
+    
+    // Combine all keywords
+    const keywords = [
+        ...languages.common,
+        ...languages.javascript,
+        ...languages.java,
+        ...languages.c,
+        ...languages.cpp,
+        ...languages.csharp,
+        ...languages.python,
+        ...languages.go,
+        ...languages.rust,
+        ...languages.swift,
+        ...languages.dart,
+        ...languages.php
+    ];
+    
+    // Replace PHP tags - special handling for PHP
+    let highlighted = code.replace(/(&lt;\?php|\?&gt;)/g, '<span class="keyword">$&</span>');
+    
+    // Replace strings - handles most languages
+    highlighted = highlighted.replace(/(".*?(?<!\\)"|'.*?(?<!\\)'|`.*?(?<!\\)`)/gs, '<span class="string">$&</span>');
+    
+    // Replace numbers
+    highlighted = highlighted.replace(/\b(\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)\b/g, '<span class="number">$&</span>');
+    
+    // Replace comments for various languages
+    // - C-style: // and /* ... */
+    // - Python/Ruby: #
+    // - SQL: --
+    highlighted = highlighted.replace(/(\/\/.*|#.*|--.*|\/\*[\s\S]*?\*\/)/g, '<span class="comment">$&</span>');
+    
+    // Replace keywords
+    for (const keyword of keywords) {
+        const regex = new RegExp(`\\b(${keyword})\\b`, 'g');
+        highlighted = highlighted.replace(regex, '<span class="keyword">$&</span>');
+    }
+    
+    // Replace special language-specific patterns
+    
+    // PHP variables
+    highlighted = highlighted.replace(/(\$[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)/g, '<span class="variable">$&</span>');
+    
+    // Function declarations - works for most C-family languages
+    highlighted = highlighted.replace(/\b([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g, '<span class="function">$1</span>(');
+    
+    // Class names (pascal case identifiers often used for classes)
+    highlighted = highlighted.replace(/\b([A-Z][a-zA-Z0-9_]*)\b/g, '<span class="class-name">$&</span>');
+    
+    // Type annotations (common in typed languages like TypeScript, Java, etc.)
+    highlighted = highlighted.replace(/(:)\s*([A-Z][a-zA-Z0-9_]*|\b(string|number|boolean|any|void|object|unknown|never)\b)/g, '$1 <span class="type">$2</span>');
+    
+    return highlighted;
+}
+
+// Function to apply fallback syntax highlighting with language-specific enhancements
+function applyFallbackHighlighting(element, language) {
+    const code = element.innerHTML;
+    let highlightedCode = '';
+    
+    // Apply language-specific variations of syntax highlighting
+    switch (language) {
+        case 'php':
+            highlightedCode = highlightPhpSyntax(code);
+            break;
+        case 'java':
+            highlightedCode = highlightJavaSyntax(code);
+            break;
+        case 'python':
+            highlightedCode = highlightPythonSyntax(code);
+            break;
+        case 'go':
+            highlightedCode = highlightGoSyntax(code);
+            break;
+        case 'rust':
+            highlightedCode = highlightRustSyntax(code);
+            break;
+        case 'dart':
+            highlightedCode = highlightDartSyntax(code);
+            break;
+        default:
+            // Use the general syntax highlighter for other languages
+            highlightedCode = highlightSyntax(code);
+    }
+    
+    element.innerHTML = highlightedCode;
+    
+    // Add language-specific class for CSS styling
+    if (language) {
+        element.classList.add(`language-${language}`);
+    }
+}
+
+// Language-specific syntax highlighting functions
+function highlightPhpSyntax(code) {
+    // Basic highlight
+    let highlighted = highlightSyntax(code);
+    
+    // PHP-specific enhancements
+    highlighted = highlighted.replace(/(\$this\b)/g, '<span class="keyword">$1</span>');
+    highlighted = highlighted.replace(/(\b__[a-zA-Z]+__\b)/g, '<span class="keyword">$1</span>'); // Magic methods
+    
+    return highlighted;
+}
+
+function highlightJavaSyntax(code) {
+    // Basic highlight
+    let highlighted = highlightSyntax(code);
+    
+    // Java-specific enhancements
+    highlighted = highlighted.replace(/\b(String|Integer|Boolean|Double|Float|Object|List|Map|Set|Collection)\b/g, 
+        '<span class="class-name">$1</span>');
+    
+    return highlighted;
+}
+
+function highlightPythonSyntax(code) {
+    // Basic highlight
+    let highlighted = highlightSyntax(code);
+    
+    // Python-specific enhancements
+    highlighted = highlighted.replace(/\b(self|cls)\b/g, '<span class="keyword">$1</span>');
+    highlighted = highlighted.replace(/(@[a-zA-Z_][a-zA-Z0-9_]*)/g, '<span class="decorator">$1</span>');
+    
+    return highlighted;
+}
+
+function highlightGoSyntax(code) {
+    // Basic highlight
+    let highlighted = highlightSyntax(code);
+    
+    // Go-specific enhancements
+    highlighted = highlighted.replace(/\b(error|string|int|bool|byte|float32|float64|uint|uint8|uint16|uint32|uint64|int8|int16|int32|int64)\b/g, 
+        '<span class="type">$1</span>');
+    
+    return highlighted;
+}
+
+function highlightRustSyntax(code) {
+    // Basic highlight
+    let highlighted = highlightSyntax(code);
+    
+    // Rust-specific enhancements
+    highlighted = highlighted.replace(/\b(String|Vec|Option|Result|Box|Rc|Arc)\b/g, 
+        '<span class="class-name">$1</span>');
+    highlighted = highlighted.replace(/'([a-zA-Z_][a-zA-Z0-9_]*)/, '<span class="lifetime">$&</span>');
+    
+    return highlighted;
+}
+
+function highlightDartSyntax(code) {
+    // Basic highlight
+    let highlighted = highlightSyntax(code);
+    
+    // Dart-specific enhancements
+    highlighted = highlighted.replace(/\b(Widget|BuildContext|State|StatefulWidget|StatelessWidget)\b/g, 
+        '<span class="class-name">$1</span>');
+    
+    return highlighted;
+} 
