@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explain It - Options</title>
+    <link rel="stylesheet" href="styles/options.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Explain It</h1>
+            <p>Configure your AI text explanation settings</p>
+        </header>
+
+        <main>
+            <section class="settings-section">
+                <h2>API Configuration</h2>
+                <div class="form-group">
+                    <label for="apiKey">OpenRouter API Key</label>
+                    <input type="password" id="apiKey" placeholder="Enter your API key">
+                    <button id="testConnection" class="button-primary">Test Connection</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="modelSelector">AI Model</label>
+                    <select id="modelSelector">
+                        <option value="google/gemini-pro">Gemini Pro</option>
+                        <option value="anthropic/claude-3-opus">Claude 3 Opus</option>
+                        <option value="anthropic/claude-3-sonnet">Claude 3 Sonnet</option>
+                        <option value="meta-llama/llama-2-70b-chat">Llama 2 70B</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="systemInstructions">System Instructions</label>
+                    <textarea id="systemInstructions" rows="4" 
+                        placeholder="Enter custom instructions for the AI..."></textarea>
+                </div>
+            </section>
+
+            <section class="settings-section">
+                <h2>Appearance</h2>
+                <div class="form-group">
+                    <label for="themeToggle">Theme</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="themeToggle">
+                        <label for="themeToggle"></label>
+                        <span class="toggle-label">Dark Mode</span>
+                    </div>
+                </div>
+            </section>
+
+            <div class="save-section">
+                <button id="saveSettings" class="button-primary">Save Settings</button>
+            </div>
+        </main>
+
+        <footer>
+            <p>Created by <a href="https://github.com/iamOmarFaruk" target="_blank">Omar Faruk</a></p>
+        </footer>
+    </div>
+    <script src="options.js"></script>
+</body>
+</html> 

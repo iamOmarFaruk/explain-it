@@ -1,0 +1,39 @@
+{
+    "manifest_version": 3,
+    "name": "Explain It - AI Text Explanation",
+    "version": "1.0.0",
+    "description": "Select text and get AI-powered explanations using OpenRouter API",
+    "permissions": [
+        "storage",
+        "activeTab",
+        "scripting"
+    ],
+    "host_permissions": [
+        "https://api.openrouter.ai/*"
+    ],
+    "action": {
+        "default_popup": "popup/popup.html",
+        "default_icon": {
+            "16": "assets/icons/icon16.png",
+            "48": "assets/icons/icon48.png",
+            "128": "assets/icons/icon128.png"
+        }
+    },
+    "options_page": "options/options.html",
+    "background": {
+        "service_worker": "background/background.js",
+        "type": "module"
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "css": ["content/styles/button.css"],
+            "js": ["content/content.js"]
+        }
+    ],
+    "icons": {
+        "16": "assets/icons/icon16.png",
+        "48": "assets/icons/icon48.png",
+        "128": "assets/icons/icon128.png"
+    }
+} 

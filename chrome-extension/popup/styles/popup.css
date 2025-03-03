@@ -1,0 +1,245 @@
+:root {
+    /* Light theme variables */
+    --background-light: #ffffff;
+    --text-light: #1d1d1f;
+    --border-light: #d2d2d7;
+    --accent-light: #0071e3;
+    --hover-light: #f5f5f7;
+    --message-bg-light: #f5f5f7;
+    --message-bot-bg-light: #e8e8ed;
+    
+    /* Dark theme variables */
+    --background-dark: #1e1e1e;
+    --text-dark: #f5f5f7;
+    --border-dark: #424245;
+    --accent-dark: #2997ff;
+    --hover-dark: #2d2d2d;
+    --message-bg-dark: #2d2d2d;
+    --message-bot-bg-dark: #363636;
+}
+
+/* System theme detection */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: var(--background-dark);
+        --text: var(--text-dark);
+        --border: var(--border-dark);
+        --accent: var(--accent-dark);
+        --hover: var(--hover-dark);
+        --message-bg: var(--message-bg-dark);
+        --message-bot-bg: var(--message-bot-bg-dark);
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --background: var(--background-light);
+        --text: var(--text-light);
+        --border: var(--border-light);
+        --accent: var(--accent-light);
+        --hover: var(--hover-light);
+        --message-bg: var(--message-bg-light);
+        --message-bot-bg: var(--message-bot-bg-light);
+    }
+}
+
+/* Base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 400px;
+    height: 500px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--background);
+    color: var(--text);
+    line-height: 1.5;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Header styles */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    background-color: var(--background);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+header h1 {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    color: var(--text);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.icon-button:hover {
+    background-color: var(--hover);
+}
+
+/* Main chat container */
+main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+.welcome-message {
+    text-align: center;
+    padding: 32px 16px;
+}
+
+.welcome-message h2 {
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+.welcome-message p {
+    color: var(--text);
+    opacity: 0.8;
+}
+
+/* Chat messages */
+.message {
+    max-width: 85%;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.message.user {
+    background-color: var(--message-bg);
+    margin-left: auto;
+}
+
+.message.bot {
+    background-color: var(--message-bot-bg);
+    margin-right: auto;
+}
+
+/* Code highlighting */
+.message pre {
+    background-color: var(--background);
+    border-radius: 6px;
+    padding: 12px;
+    margin: 8px 0;
+    overflow-x: auto;
+}
+
+.message code {
+    font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+    font-size: 13px;
+}
+
+/* Footer */
+footer {
+    padding: 16px;
+    border-top: 1px solid var(--border);
+    background-color: var(--background);
+}
+
+.footer-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.footer-actions.hidden {
+    display: none;
+}
+
+.action-button {
+    background: none;
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    color: var(--text);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.action-button:hover {
+    background-color: var(--hover);
+}
+
+/* Typing indicator */
+.typing-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    padding: 8px;
+}
+
+.typing-indicator.hidden {
+    display: none;
+}
+
+.typing-indicator span {
+    width: 8px;
+    height: 8px;
+    background-color: var(--text);
+    border-radius: 50%;
+    opacity: 0.4;
+    animation: typing 1s infinite;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text);
+    opacity: 0.8;
+} 
